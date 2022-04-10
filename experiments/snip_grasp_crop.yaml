@@ -56,7 +56,6 @@ fixed:
     checkpoint_model: None
 
     disable_cuda_benchmark: 1  # speedup (disable) vs reproducibility (leave it)
-    eval: 0
     disable_autoconfig: 0  # for the brave
     preload_all_data: 0  # load all data into ram memory for speedups
 

@@ -1,4 +1,3 @@
-import logging
 from sacred import Experiment
 import numpy as np
 import seml
@@ -7,6 +6,7 @@ import sys
 
 sys.path.append('.')
 
+from common import load_checkpoint, log_start_run
 from models import GeneralModel
 from models.statistics.Metrics import Metrics
 from utils.config_utils import *
@@ -14,7 +14,6 @@ from utils.model_utils import *
 from utils.system_utils import *
 
 import torch
-
 from copy import deepcopy
 
 # from lipEstimation.lipschitz_utils import compute_module_input_sizes
@@ -331,29 +330,6 @@ def assert_compatibilities(arguments):
         raise ValueError(f"StructuredCroPRes and StructuredCroPitRes criterion only compatible with ResNet18 model, got {arguments['model']}")
     if arguments["prune_criterion"] not in ["StructuredCroPRes", "StructuredCroPitRes"] and arguments["model"] in ["ResNet18"]:
         raise ValueError(f"ResNet18 model only compatible with StructuredCroPRes and StructuredCroPitRes criterion, got {arguments['prune_criterion']}")
-
-
-def load_checkpoint(arguments, model, out):
-    from utils.constants import RESULTS_DIR
-    if (not (arguments['checkpoint_name'] is None)) and (not (arguments['checkpoint_model'] is None)):
-        path = os.path.join(RESULTS_DIR, arguments['checkpoint_name'], MODELS_DIR, arguments['checkpoint_model'])
-        state = DATA_MANAGER.load_python_obj(path)
-        try:
-            model.load_state_dict(state)
-        except KeyError as e:
-            print(list(state.keys()))
-            raise e
-        out(f"Loaded checkpoint {arguments['checkpoint_name']} from {arguments['checkpoint_model']}")
-
-
-def log_start_run(arguments, out):
-    arguments.PyTorch_version = torch.__version__
-    arguments.PyThon_version = sys.version
-    arguments.pwd = os.getcwd()
-    out("PyTorch version:", torch.__version__, "Python version:", sys.version)
-    out("Working directory: ", os.getcwd())
-    out("CUDA avalability:", torch.cuda.is_available(), "CUDA version:", torch.version.cuda)
-    out(arguments)
 
 
 @ex.post_run_hook
