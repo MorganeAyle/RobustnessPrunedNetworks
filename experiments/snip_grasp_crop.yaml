@@ -1,0 +1,124 @@
+seml:
+  executable: experiments/main.py
+  name: train
+  output_dir: /nfs/students/ayle/RobustnessDetectionPrunedNetworks/logs
+  project_root_dir: ..
+  conda_environment: inv
+
+slurm:
+  experiments_per_job: 1
+  sbatch_options:
+    gres: gpu:1       # num GPUs
+    mem: 8G          # memory
+    cpus-per-task: 1  # num cores
+    time: 0-4:00     # max time, D-HH:MM
+    partition: ['gpu_all']
+#    qos: interactive
+
+###### BEGIN PARAMETER CONFIGURATION ######
+
+fixed:
+  arguments:
+    eval_freq: 1000  # evaluate every n batches
+    save_freq: 1e6  # save model every n epochs, besides before and after training
+    batch_size: 512 # 128  # size of batches, for Imagenette 128
+    seed: 1234  # random seed
+    plot_weights_freq: 10  # plot pictures to tensorboard every n epochs
+    epochs: 10
+    snip_iter: 5  # number of batches to use while computing snip scores
+    pruning_limit: 0.8  # Prune until here, if structured in nodes, if unstructured in weights. most criterions use this instead of the pruning_rate
+    local_pruning: 0
+    learning_rate: 2e-3
+    grad_clip: 10
+    grad_noise: 0  # added gaussian noise to gradients
+    l2_reg: 5e-5  # weight decay
+    l1_reg: 0  # l1-norm regularisation
+    lp_reg: 0  # lp regularisation with p < 1
+
+    loss: CrossEntropy
+    optimizer: ADAM
+    model: LeNet5 # WideResNet28x10  # ResNet not supported with structured
+    data_set: FASHION
+    ood_data_set: MNIST
+    ood_prune_data_set: MNIST  # dataset's train loader will be used during pruning if needed by method
+    prune_criterion: CroP  # options: SNIP, CroP, GRASP
+    train_scheme: DefaultTrainer  # default: DefaultTrainer
+    attack: FGSM
+    epsilon: 8
+    eval_ood_data_sets: ['MNIST']
+    eval_attacks: ['FGSM', 'L2FGSM']
+    eval_epsilons: [8, 16]
+
+    device: cuda
+    results_dir: 'LeNet5'
+
+    checkpoint_name: None
+    checkpoint_model: None
+
+    disable_cuda_benchmark: 1  # speedup (disable) vs reproducibility (leave it)
+    eval: 0
+    disable_autoconfig: 0  # for the brave
+    preload_all_data: 0  # load all data into ram memory for speedups
+
+    get_hooks: 0
+    enable_masking: 1  # enable the ability to prune unstructured
+    outer_layer_pruning: 1  # allow to prune outer layers (unstructured) or not (structured)
+
+    disable_histograms: 0
+    disable_saliency: 0
+    disable_confusion: 0
+    disable_weightplot: 0
+    disable_netplot: 0
+    skip_first_plot: 0
+    disable_activations: 0
+
+    # Below parameters are not needed
+    prune_freq: 1  # if pruning during training: how long to wait between pruning events after first pruning
+    prune_delay: 0  # "if pruning during training: how long to wait before pruning first time
+    lower_limit: 0.5
+    rewind_to: 0  # rewind to this epoch if rewinding is done
+    prune_steps: 0  # 's' in algorithm box, number of pruning steps for 'rule of thumb'
+    pruning_rate: 0.00  # pruning rate passed to criterion at pruning event. however, most override this
+    prune_to: 0
+    enable_rewinding: 0
+
+# Uncomment Dataset group depending on which dataset is being used
+FASHION:
+  fixed:
+    arguments:
+      input_dim: [1, 28, 28]
+      output_dim: 10
+      hidden_dim: [512]
+      N: 60000
+      mean: (0.5,)
+      std: (0.5,)
+
+#MNIST:
+#  fixed:
+#    arguments:
+#      input_dim: [1, 28, 28]
+#      output_dim: 10
+#      hidden_dim: [512]
+#      N: 60000
+#      mean: (0.1307,)
+#      std: (0.3081,)
+
+#CIFAR10:
+#  fixed:
+#    arguments:
+#      input_dim: [3, 32, 32]
+#      output_dim: 10
+#      hidden_dim: [512]
+#      N: 60000
+#      mean:  (0.4914, 0.4822, 0.4465)
+#      std: (0.2471, 0.2435, 0.2616)
+
+#CIFAR100:
+#  fixed:
+#    arguments:
+#      input_dim: [3, 32, 32]
+#      output_dim: 100
+#      hidden_dim: [512]
+#      N: 50000
+#      mean:  (0.5071, 0.4865, 0.4409)
+#      std: (0.2673, 0.2564, 0.2762)
