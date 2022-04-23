@@ -28,7 +28,6 @@ def main(
         arguments,
         metrics: Metrics
 ):
-
     global out
     out = metrics.log_line
     out(f"starting at {get_date_stamp()}")
@@ -327,9 +326,11 @@ def main(
 
 def assert_compatibilities(arguments):
     if arguments["prune_criterion"] in ["StructuredCroPRes", "StructuredCroPitRes"] and arguments["model"] not in ["ResNet18"]:
-        raise ValueError(f"StructuredCroPRes and StructuredCroPitRes criterion only compatible with ResNet18 model, got {arguments['model']}")
-    if arguments["prune_criterion"] not in ["StructuredCroPRes", "StructuredCroPitRes"] and arguments["model"] in ["ResNet18"]:
-        raise ValueError(f"ResNet18 model only compatible with StructuredCroPRes and StructuredCroPitRes criterion, got {arguments['prune_criterion']}")
+        raise ValueError(
+            f"StructuredCroPRes and StructuredCroPitRes criterion only compatible with ResNet18 model, got {arguments['model']}")
+    if arguments["prune_criterion"] in ["StructuredCroP", "StructuredCroPit"] and arguments["model"] in ["ResNet18"]:
+        raise ValueError(
+            f"ResNet18 model only compatible with StructuredCroPRes and StructuredCroPitRes criterion for structured pruning, got {arguments['prune_criterion']}")
 
 
 @ex.post_run_hook

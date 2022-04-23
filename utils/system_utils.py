@@ -9,6 +9,7 @@ from utils.model_utils import save_models
 Handles interactions with system
 """
 
+
 def setup_directories():
     from utils.constants import RESULTS_DIR
     stamp = DATA_MANAGER.stamp
