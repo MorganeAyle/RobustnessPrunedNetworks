@@ -45,7 +45,7 @@ fixed:
     data_set: FASHION
     ood_data_set: MNIST
     ood_prune_data_set: MNIST  # dataset's train loader will be used during pruning if needed by method
-    prune_criterion: EmptyCrit  # HoyerSquare is one shot, pruning limit doesn't matter in this implementation
+    prune_criterion: IMP  # HoyerSquare is one shot, pruning limit doesn't matter in this implementation
     train_scheme: DefaultTrainer  # default: DefaultTrainer
     attack: FGSM
     epsilon: 8

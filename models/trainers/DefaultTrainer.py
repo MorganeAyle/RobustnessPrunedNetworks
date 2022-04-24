@@ -434,7 +434,7 @@ class DefaultTrainer:
             self._model.save_rewind_weights()
 
     def _is_not_finished_pruning(self):
-        return self._arguments['pruning_limit'] > (self._model.pruned_percentage + 0.01)
+        return len(self._criterion.steps)
 
     @staticmethod
     def _get_accuracy(output, y):
