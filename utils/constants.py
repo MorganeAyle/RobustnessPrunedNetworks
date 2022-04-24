@@ -97,6 +97,8 @@ STRUCTURED = [
     "StructuredCroPitRes"
 ]
 
+BEFORE_TRAINING += STRUCTURED
+
 DURING_TRAINING = [
     "IMP"
 ]

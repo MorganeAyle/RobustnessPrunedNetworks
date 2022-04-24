@@ -227,7 +227,7 @@ class Pruneable(GeneralModel):
     @property
     def compressed_size(self):
 
-        if not self.is_maskable and not self.l0:
+        if not self.is_maskable:
             return np.nan
             # raise Exception("mask is off")
 
