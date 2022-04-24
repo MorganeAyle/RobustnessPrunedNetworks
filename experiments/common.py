@@ -1,7 +1,8 @@
 import sys
 sys.path.append('.')
 
-from utils.system_utils import *
+import os
+from utils.constants import MODELS_DIR, DATA_MANAGER
 import torch
 
 

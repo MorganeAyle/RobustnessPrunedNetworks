@@ -3,6 +3,7 @@ import pickle
 import sys
 import time
 
+import os
 import torch
 import torch.nn.functional as F
 from torch.optim.optimizer import Optimizer
@@ -16,9 +17,12 @@ from models.statistics import Metrics
 from models.statistics.Flops import FLOPCounter
 from models.statistics.Saliency import Saliency
 from utils.model_utils import find_right_model
-from utils.system_utils import *
-from utils.attacks_utils import construct_adversarial_examples
-from utils.metrics import calculate_aupr, calculate_auroc
+from utils.constants import STRUCTURED, OPTIMS, SUMMARY_DIR, PRINTCOLOR_BOLD, EARLY_CROP, PRINTCOLOR_END, \
+    BEFORE_TRAINING, HYDRA, DURING_TRAINING, DATA_MANAGER
+from utils.system_utils import setup_directories, save_codebase_of_run, OUTPUT_DIR, save_models, \
+    report_error
+# from utils.attacks_utils import construct_adversarial_examples
+# from utils.metrics import calculate_aupr, calculate_auroc
 
 # from augerino import models as aug_models
 
@@ -339,7 +343,7 @@ class DefaultTrainer:
                                                        lr=self._arguments['learning_rate'],
                                                        weight_decay=self._arguments['l2_reg'])
                     self._metrics.model_to_tensorboard(self._model, timestep=epoch)
-                    
+
             if self._arguments["prune_criterion"] in HYDRA:
                 self._model = self._criterion.model
                 """

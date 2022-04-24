@@ -3,15 +3,19 @@ import numpy as np
 import seml
 
 import sys
+import os
 
 sys.path.append('.')
 
 from common import load_checkpoint, log_start_run
 from models import GeneralModel
 from models.statistics.Metrics import Metrics
-from utils.config_utils import *
-from utils.model_utils import *
-from utils.system_utils import *
+from utils.config_utils import configure_device, configure_seeds
+from utils.constants import OPTIMS, NETWORKS_DIR, DATASETS, LOSS_DIR, TRAINERS_DIR, DATA_MANAGER, TESTERS_DIR, \
+    DATASET_PATH, set_results_dir, CRITERION_DIR
+from utils.model_utils import find_right_model
+from utils.system_utils import get_date_stamp
+from utils.data_loaders import CIFAR10C
 
 import torch
 from copy import deepcopy
@@ -325,7 +329,8 @@ def main(
 
 
 def assert_compatibilities(arguments):
-    if arguments["prune_criterion"] in ["StructuredCroPRes", "StructuredCroPitRes"] and arguments["model"] not in ["ResNet18"]:
+    if arguments["prune_criterion"] in ["StructuredCroPRes", "StructuredCroPitRes"] and arguments["model"] not in [
+        "ResNet18"]:
         raise ValueError(
             f"StructuredCroPRes and StructuredCroPitRes criterion only compatible with ResNet18 model, got {arguments['model']}")
     if arguments["prune_criterion"] in ["StructuredCroP", "StructuredCroPit"] and arguments["model"] in ["ResNet18"]:

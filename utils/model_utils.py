@@ -2,11 +2,17 @@ import importlib
 import inspect
 from typing import List
 
+import os
+import torch
 import torch.nn as nn
 import torch.optim as opt
 
-from utils.constants import *
-from utils.data_loaders import *
+from utils.constants import types, MODELS_DIR, OPTIMS, DATASETS, DATA_MANAGER
+from utils.data_loaders import get_svhn_loaders, get_lsun_loaders, get_mnist_loaders, get_kmnist_loaders, \
+    get_rubbish_loaders, get_cifar10_loaders, get_cifar100_loaders, get_custom_cifar10_loaders, \
+    get_unnormalized_cifar100_loaders, get_unnormalized_cifar10_loaders, get_unnormalized_fashionmnist_loaders, \
+    get_fashionmnist_loaders, get_unnormliazed_mnist_loaders, get_oodomain_loaders, get_omniglot_loaders, \
+    get_gaussian_noise_loaders
 
 models = {x: {} for x in types}  # types = [LOSS_DIR, NETWORKS_DIR, CRITERION_DIR, TRAINERS_DIR, TESTERS_DIR]
 
@@ -91,7 +97,8 @@ def save_models(models: List[nn.Module],
                                      print_success=False)
         if not modstr.startswith('Metrics'):
             DATA_MANAGER.save_python_obj(mod,
-                                         os.path.join(RESULTS_DIR, DATA_MANAGER.stamp, MODELS_DIR, modstr + 'mod_' + suffix),
+                                         os.path.join(RESULTS_DIR, DATA_MANAGER.stamp, MODELS_DIR,
+                                                      modstr + 'mod_' + suffix),
                                          print_success=False)
 
 

@@ -1,8 +1,9 @@
 import inspect
 import traceback
 from datetime import datetime
+import os
 
-from utils.constants import *
+from utils.constants import DATA_MANAGER, OUTPUT_DIRS, OUTPUT_DIR, CODEBASE_DIR
 from utils.model_utils import save_models
 
 """
