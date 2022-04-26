@@ -3,8 +3,16 @@ import numpy as np
 import seml
 
 import sys
+import os
 
 sys.path.append('.')
+from utils.constants import WORKING_DIR_PATH
+
+sys.path.append(os.path.join(WORKING_DIR_PATH, 'gitmodules'))
+sys.path.append(os.path.join(WORKING_DIR_PATH, 'gitmodules/learning_invariances'))
+sys.path.append(os.path.join(WORKING_DIR_PATH, 'gitmodules/learning_invariances/augerino'))
+
+sys.path.append(os.path.join(WORKING_DIR_PATH, 'gitmodules/LieConv'))
 
 from utils.model_utils import *
 from utils.system_utils import *
@@ -14,7 +22,7 @@ import pickle
 
 from copy import deepcopy
 
-from augerino import models as augerino_models
+from gitmodules.learning_invariances.augerino import models as augerino_models
 from torchvision import datasets, transforms
 from tqdm import tqdm
 from utils.metrics import calculate_auroc
@@ -27,7 +35,6 @@ from utils.config_utils import configure_device, configure_seeds
 from utils.constants import NETWORKS_DIR, DATASETS, DATASET_PATH, set_results_dir, CRITERION_DIR
 from utils.model_utils import find_right_model
 from utils.system_utils import get_date_stamp
-from utils.data_loaders import CIFAR10CU
 
 ex = Experiment()
 seml.setup_logger(ex)

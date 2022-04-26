@@ -5,6 +5,7 @@ import numpy as np
 from utils.data_manager import DataManager
 
 # Where everything will be saved (data, results, ...)
+WORKING_DIR_PATH = "/nfs/homedirs/ayle/RobustnessDetectionPrunedNetworks/"
 SAVE_DIR_PATH = "/nfs/students/ayle/RobustnessDetectionPrunedNetworks/"
 
 CODEBASE_DIR = "codebase"

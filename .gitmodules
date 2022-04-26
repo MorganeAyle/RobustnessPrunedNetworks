@@ -1,0 +1,6 @@
+[submodule "gitmodules/learning-invariances"]
+	path = gitmodules/learning_invariances/
+	url = https://github.com/g-benton/learning-invariances.git
+[submodule "gitmodules/LieConv"]
+	path = gitmodules/LieConv
+	url = https://github.com/mfinzi/LieConv.git
