@@ -7,7 +7,7 @@ import os
 
 sys.path.append('.')
 
-from common import load_checkpoint, log_start_run
+from common import load_checkpoint, assert_compatibilities
 from models import GeneralModel
 from models.statistics.Metrics import Metrics
 from utils.config_utils import configure_device, configure_seeds
@@ -326,16 +326,6 @@ def main(
     # results['lip_spec'] = lip_spec.cpu().numpy()
 
     return results
-
-
-def assert_compatibilities(arguments):
-    if arguments["prune_criterion"] in ["StructuredCroPRes", "StructuredCroPitRes"] and arguments["model"] not in [
-        "ResNet18"]:
-        raise ValueError(
-            f"StructuredCroPRes and StructuredCroPitRes criterion only compatible with ResNet18 model, got {arguments['model']}")
-    if arguments["prune_criterion"] in ["StructuredCroP", "StructuredCroPit"] and arguments["model"] in ["ResNet18"]:
-        raise ValueError(
-            f"ResNet18 model only compatible with StructuredCroPRes and StructuredCroPitRes criterion for structured pruning, got {arguments['prune_criterion']}")
 
 
 @ex.post_run_hook

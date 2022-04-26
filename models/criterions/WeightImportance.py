@@ -19,10 +19,8 @@ class WeightImportance(General):
     https://arxiv.org/abs/2006.00896
     """
 
-    def __init__(self, limit=0.0, steps=5, orig_scores=False, *args, **kwargs):
+    def __init__(self, orig_scores=False, *args, **kwargs):
         super(WeightImportance, self).__init__(*args, **kwargs)
-        # always smaller than limit, steps+1 elements (including limit)
-        # self.steps = [limit - (limit - lower_limit) * (0.5 ** i) for i in range(steps - 1)] + [limit]
         self.orig_scores = orig_scores
 
     def get_prune_indices(self, *args, **kwargs):

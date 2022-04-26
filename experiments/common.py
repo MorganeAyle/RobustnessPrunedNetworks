@@ -27,3 +27,12 @@ def log_start_run(arguments, out):
     out("Working directory: ", os.getcwd())
     out("CUDA avalability:", torch.cuda.is_available(), "CUDA version:", torch.version.cuda)
     out(arguments)
+
+def assert_compatibilities(arguments):
+    if arguments["prune_criterion"] in ["StructuredCroPRes", "StructuredCroPitRes"] and arguments["model"] not in [
+        "ResNet18"]:
+        raise ValueError(
+            f"StructuredCroPRes and StructuredCroPitRes criterion only compatible with ResNet18 model, got {arguments['model']}")
+    if arguments["prune_criterion"] in ["StructuredCroP", "StructuredCroPit"] and arguments["model"] in ["ResNet18"]:
+        raise ValueError(
+            f"ResNet18 model only compatible with StructuredCroPRes and StructuredCroPitRes criterion for structured pruning, got {arguments['prune_criterion']}")
