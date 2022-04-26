@@ -13,6 +13,7 @@ slurm:
     cpus-per-task: 1  # num cores
     time: 0-4:00     # max time, D-HH:MM
     partition: ['gpu_all']
+    exclude: mdsi-gpu01,mdsi-gpu02,gpu18,gpu19,gpu15,gpu16,gpu17
 #    qos: interactive
 
 ###### BEGIN PARAMETER CONFIGURATION ######
