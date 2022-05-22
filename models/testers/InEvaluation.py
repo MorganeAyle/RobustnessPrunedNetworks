@@ -39,11 +39,13 @@ class InEvaluation:
     Performs evaluation on test data
     """
 
-    def __init__(self, test_loader, model, device, ensemble=None, **kwargs):
+    def __init__(self, test_loader, model, device, ensemble=None, batch_results=False, group_batch_size=100, **kwargs):
         self.device = device
         self.model = model
         self.test_loader = test_loader
         self.ensemble = ensemble
+        self.batch_results = batch_results
+        self.group_batch_size = group_batch_size
 
     def evaluate(self, **kwargs):
         true_labels = np.zeros(0)
@@ -67,6 +69,7 @@ class InEvaluation:
                     for model in self.ensemble:
                         out += model(x)
                     out /= len(self.ensemble)
+
                 # Logits to probability distribution
                 probs = F.softmax(out, dim=-1)
                 # Maximum softmax probability
@@ -90,20 +93,34 @@ class InEvaluation:
                 # Compute NLL
                 nll.append(-np.mean(np.log(preds.cpu().numpy())))
 
-                true_labels = np.concatenate((true_labels, np.ones(len(x))))
-                all_preds = np.concatenate((all_preds, preds.cpu().reshape((-1))))
+                if not self.batch_results:
+                    true_labels = np.concatenate((true_labels, np.ones(len(x))))
+                    all_preds = np.concatenate((all_preds, preds.cpu().reshape((-1))))
+                else:
+                    np_preds = preds.cpu().reshape((-1)).numpy()
+                    for i in range(0, len(x), self.group_batch_size):
+                        true_labels = np.concatenate((true_labels, np.ones(1)))
+                        all_preds = np.concatenate((all_preds, np.mean(np_preds[i:i + self.group_batch_size], keepdims=True)))
+
                 conf_true_labels = np.concatenate((conf_true_labels, torch.isclose(y.cpu(), indices.cpu()).numpy().astype(float).reshape(-1)))
 
-        conf_auroc = calculate_auroc(conf_true_labels, all_preds)
-        conf_aupr = calculate_aupr(conf_true_labels, all_preds)
-        brier_score = np.mean(np.array(brier_scores))
-        ece = calculate_ece(all_preds, all_correct)
+        if not self.batch_results:
+            conf_auroc = calculate_auroc(conf_true_labels, all_preds)
+            conf_aupr = calculate_aupr(conf_true_labels, all_preds)
+            brier_score = np.mean(np.array(brier_scores))
+            ece = calculate_ece(all_preds, all_correct)
 
-        return {'conf_auroc': conf_auroc,
-                'conf_aupr': conf_aupr,
-                'brier_score': brier_score,
-                'entropy': np.mean(entropies),
-                'test_acc': np.mean(acc),
-                'nll': np.mean(nll),
-                'ece': ece,
-                }, true_labels, all_preds, entropies
+            return {'conf_auroc': conf_auroc,
+                    'conf_aupr': conf_aupr,
+                    'brier_score': brier_score,
+                    'entropy': np.mean(entropies),
+                    'test_acc': np.mean(acc),
+                    'nll': np.mean(nll),
+                    'ece': ece,
+                    }, true_labels, all_preds, entropies
+
+        else:
+            return {
+                    'entropy': np.mean(entropies),
+                    'test_acc': np.mean(acc),
+                    }, true_labels, all_preds, entropies

@@ -15,12 +15,14 @@ class OODEvaluation:
     Performs evaluation to adversarial attacks
     """
 
-    def __init__(self, ood_loader, model, device, ood_dataset, ensemble=None, **kwargs):
+    def __init__(self, ood_loader, model, device, ood_dataset, ensemble=None, batch_results=False, group_batch_size=100, **kwargs):
         self.device = device
         self.model = model
         self.ood_loader = ood_loader
         self.ood_dataset = ood_dataset
         self.ensemble = ensemble
+        self.batch_results = batch_results
+        self.group_batch_size = group_batch_size
 
     def evaluate(self, true_labels, all_preds, entropies, **kwargs):
         ood_entropies = np.zeros(0)
@@ -37,6 +39,7 @@ class OODEvaluation:
                     for model in self.ensemble:
                         out += model(x)
                     out /= len(self.ensemble)
+
                 probs = F.softmax(out, dim=-1)
                 preds, _ = torch.max(probs, dim=-1)
 
@@ -44,24 +47,41 @@ class OODEvaluation:
                 entropies = np.concatenate((entropies, entropy.detach().cpu().numpy()))
                 ood_entropies = np.concatenate((ood_entropies, entropy.cpu().numpy()))
 
-                true_labels = np.concatenate((true_labels, np.zeros(len(x))))
-                all_preds = np.concatenate((all_preds, preds.cpu().reshape((-1))))
+                if not self.batch_results:
+                    true_labels = np.concatenate((true_labels, np.zeros(len(x))))
+                    all_preds = np.concatenate((all_preds, preds.cpu().reshape((-1))))
+                else:
+                    np_preds = preds.cpu().reshape((-1)).numpy()
+                    for i in range(0, len(x), self.group_batch_size):
+                        true_labels = np.concatenate((true_labels, np.zeros(1)))
+                        all_preds = np.concatenate((all_preds, np.mean(np_preds[i:i + self.group_batch_size], keepdims=True)))
 
-        auroc = calculate_auroc(true_labels, all_preds)
-        aupr = calculate_aupr(true_labels, all_preds)
+        if not self.batch_results:
+            auroc = calculate_auroc(true_labels, all_preds)
+            aupr = calculate_aupr(true_labels, all_preds)
 
-        auroc_entropy = calculate_auroc(1 - true_labels, entropies)
-        aupr_entropy = calculate_aupr(1 - true_labels, entropies)
+            auroc_entropy = calculate_auroc(1 - true_labels, entropies)
+            aupr_entropy = calculate_aupr(1 - true_labels, entropies)
 
-        auroc_name = f'auroc_{self.ood_dataset}'
-        aupr_name = f'aupr_{self.ood_dataset}'
-        auroc_ent_name = f'auroc_entropy_{self.ood_dataset}'
-        aupr_ent_name = f'aupr_entropy_{self.ood_dataset}'
-        entropy_name = f'entropy_{self.ood_dataset}'
+            auroc_name = f'auroc_{self.ood_dataset}'
+            aupr_name = f'aupr_{self.ood_dataset}'
+            auroc_ent_name = f'auroc_entropy_{self.ood_dataset}'
+            aupr_ent_name = f'aupr_entropy_{self.ood_dataset}'
+            entropy_name = f'entropy_{self.ood_dataset}'
 
-        return {auroc_name: auroc,
-                aupr_name: aupr,
-                entropy_name: np.mean(ood_entropies),
-                auroc_ent_name: auroc_entropy,
-                aupr_ent_name: aupr_entropy
-                }
+            return {auroc_name: auroc,
+                    aupr_name: aupr,
+                    entropy_name: np.mean(ood_entropies),
+                    auroc_ent_name: auroc_entropy,
+                    aupr_ent_name: aupr_entropy
+                    }
+        else:
+            auroc = calculate_auroc(true_labels, all_preds)
+            aupr = calculate_aupr(true_labels, all_preds)
+
+            auroc_name = f'auroc_{self.ood_dataset}'
+            aupr_name = f'aupr_{self.ood_dataset}'
+
+            return {auroc_name: auroc,
+                    aupr_name: aupr,
+                    }

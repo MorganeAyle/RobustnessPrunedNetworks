@@ -449,7 +449,8 @@ def get_oodomain_loaders(arguments=None, mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.
         )
     else:
         raise NotImplementedError(f"OODomain loader not implemented for {arguments['data_set']}")
-    return load(arguments, test_set, train_set)
+    return load(arguments, test_set, train_set, val=None)
+
     # bs = arguments['batch_size']
     # train_loader = torch.utils.data.DataLoader(
     #     OODomain(arguments, train=True),

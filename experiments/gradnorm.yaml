@@ -1,6 +1,6 @@
 seml:
-  executable: experiments/evaluate.py
-  name: evaluate
+  executable: experiments/gradnorm.py
+  name: gradnorm
   output_dir: /nfs/students/ayle/RobustnessDetectionPrunedNetworks/logs
   project_root_dir: ..
   conda_environment: inv
@@ -11,7 +11,7 @@ slurm:
     gres: gpu:1       # num GPUs
     mem: 8G          # memory
     cpus-per-task: 1  # num cores
-    time: 0-01:00     # max time, D-HH:MM
+    time: 0-04:00     # max time, D-HH:MM
     partition: ['gpu_all']
     exclude: mdsi-gpu01,mdsi-gpu02,gpu18,gpu19,gpu15,gpu16,gpu17
 #    qos: interactive
@@ -20,10 +20,7 @@ slurm:
 
 fixed:
   arguments:
-    batch_size: 500
-
-    batch_results: True
-    group_batch_size: 100
+#    batch_size: 100
 
     test_scheme: ['OODEvaluation', 'AdversarialEvaluation', 'DSEvaluation']
     model: ResNet18
@@ -36,7 +33,8 @@ fixed:
 
     results_dir: "/nfs/students/ayle/guided-research/gitignored/results/ResNet18"
 #    checkpoint_name: '2021-10-11_10.01.10_model=ResNet18_dataset=CIFAR10_prune-criterion=EmptyCrit_pruning-limit=0.0_train-scheme=DefaultTrainer_seed=1234'
-    checkpoint_name: '2021-10-11_10.01.08_model=ResNet18_dataset=CIFAR10_prune-criterion=EmptyCrit_pruning-limit=0.0_train-scheme=DefaultTrainer_seed=2345'
+#    checkpoint_name: '2021-10-11_10.01.08_model=ResNet18_dataset=CIFAR10_prune-criterion=EmptyCrit_pruning-limit=0.0_train-scheme=DefaultTrainer_seed=2345'
+#    checkpoint_name: '2021-10-11_10.01.09_model=ResNet18_dataset=CIFAR10_prune-criterion=EmptyCrit_pruning-limit=0.0_train-scheme=DefaultTrainer_seed=3456'
     checkpoint_model: ResNet18_finished
 
     disable_cuda_benchmark: 1  # speedup (disable) vs reproducibility (leave it)
@@ -82,3 +80,19 @@ CIFAR10:
 #      N: 50000
 #      mean:  (0.5071, 0.4865, 0.4409)
 #      std: (0.2673, 0.2564, 0.2762)
+
+grid:
+  arguments.batch_size:
+    type: choice
+    options:
+      - 100
+      - 5
+      - 2
+      - 1
+
+  arguments.checkpoint_name:
+    type: choice
+    options:
+      - '2021-10-11_10.01.10_model=ResNet18_dataset=CIFAR10_prune-criterion=EmptyCrit_pruning-limit=0.0_train-scheme=DefaultTrainer_seed=1234'
+      - '2021-10-11_10.01.08_model=ResNet18_dataset=CIFAR10_prune-criterion=EmptyCrit_pruning-limit=0.0_train-scheme=DefaultTrainer_seed=2345'
+      - '2021-10-11_10.01.09_model=ResNet18_dataset=CIFAR10_prune-criterion=EmptyCrit_pruning-limit=0.0_train-scheme=DefaultTrainer_seed=3456'
